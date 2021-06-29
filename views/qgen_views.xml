@@ -1,0 +1,54 @@
+<odoo>
+  <!-- <data> -->
+  <record id="slide_qgen_view_form" model="ir.ui.view">
+    <field name="name">slide.qgen.view.form</field>
+    <field name="model">slide.qgen</field>
+    <field name="arch" type="xml">
+      <form string="Generate quetions">
+        <sheet>
+          <group>
+            <field name="name"/>
+            <field name="channel_name" require="true"/>
+            <field name="origin"/>
+            <field name="result"/>
+          </group>
+          <button name="gen_quetions" type="object" class="btn-primary" icon="fa-magic" string='Generate'></button>
+        </sheet>
+        <notebook>
+          <page name="quetions" string="quetions">
+            <field name="question_ids" nolabel="1">
+              <tree>
+                <field name="sequence" widget="handle"/>
+                <field name="question"/>
+              </tree>
+            </field>
+          </page>
+        </notebook>
+      </form>
+    </field>
+  </record>
+
+  <!-- <record id="slide_qgen_action_window" model="ir.actions.act_window.view"> <field name="sequence" eval="1"/> <field name="view_mode">form</field> <field name="act_window_id" ref="slide_qgen_view_form"/> <field name="view_id" ref="slide_qgen_view_form"/> </record> -->
+  <record id="slide_qgen_action" model="ir.actions.act_window">
+    <field name="name">Generation quetions</field>
+    <field name="res_model">slide.qgen</field>
+    <field name="view_mode">tree,form</field>
+    <!-- <field name="domain">[]</field> <field name="context">{}</field> -->
+    <!-- <field name="help" type="html"></field> -->
+  </record>
+  <!-- groups="groups_id" -->
+  <menuitem id="qgen_menu" name="Generate quations" action="slide_qgen_action" parent="website_slides.website_slides_menu_courses" sequence="10"/>
+  <!-- actions opening views on models -->
+  <!-- <record model="ir.actions.act_window" id="c:\users\vojd\projects\addons\empty.action_window"> <field name="name">C:\Users\vojd\projects\addons\empty window</field> <field name="res_model">c:\users\vojd\projects\addons\empty.c:\users\vojd\projects\addons\empty</field> <field name="view_mode">tree,form</field> </record> -->
+
+  <!-- server action to the one above -->
+  <!-- <record model="ir.actions.server" id="c:\users\vojd\projects\addons\empty.action_server"> <field name="name">C:\Users\vojd\projects\addons\empty server</field> <field name="model_id" ref="model_c:\users\vojd\projects\addons\empty_c:\users\vojd\projects\addons\empty"/> <field name="state">code</field> <field name="code"> action = { "type": "ir.actions.act_window", "view_mode": "tree,form", "res_model": model._name, } </field> </record> -->
+
+  <!-- Top menu item -->
+  <!-- <menuitem name="C:\Users\vojd\projects\addons\empty" id="c:\users\vojd\projects\addons\empty.menu_root"/> -->
+  <!-- menu categories -->
+  <!-- <menuitem name="Menu 1" id="c:\users\vojd\projects\addons\empty.menu_1" parent="c:\users\vojd\projects\addons\empty.menu_root"/> <menuitem name="Menu 2" id="c:\users\vojd\projects\addons\empty.menu_2" parent="c:\users\vojd\projects\addons\empty.menu_root"/> -->
+  <!-- actions -->
+  <!-- <menuitem name="List" id="c:\users\vojd\projects\addons\empty.menu_1_list" parent="c:\users\vojd\projects\addons\empty.menu_1" action="c:\users\vojd\projects\addons\empty.action_window"/> <menuitem name="Server to list" id="c:\users\vojd\projects\addons\empty" parent="c:\users\vojd\projects\addons\empty.menu_2" action="c:\users\vojd\projects\addons\empty.action_server"/> -->
+  <!-- </data> -->
+</odoo>

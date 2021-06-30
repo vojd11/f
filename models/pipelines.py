@@ -2,25 +2,19 @@ import itertools
 import logging
 from typing import Optional, Dict, Union
 
-try:
-    import sentencepiece
-    import nltk
+# sentencepiece help torch to work somehow
+import sentencepiece
+import nltk
+import torch
+from transformers import (
+    AutoModelForSeq2SeqLM,
+    AutoTokenizer,
+    PreTrainedModel,
+    PreTrainedTokenizer,
+)
 
-    sent_tokenize = nltk.sent_tokenize
-    nltk.download("punkt")
-    import torch
-    from transformers import (
-        AutoModelForSeq2SeqLM,
-        AutoTokenizer,
-        PreTrainedModel,
-        PreTrainedTokenizer,
-    )
-except:
-    import pip
-
-    pip.main(["install", "torch", "transformers", "nltk", "sentencepiece", "protobuf"])
-
-
+sent_tokenize = nltk.sent_tokenize
+nltk.download("punkt")
 _logger = logging.getLogger(__name__)
 
 

@@ -12,7 +12,7 @@ class QGen(models.Model):
     _name = "slide.qgen"
     _description = "quetion generation"
 
-    name = fields.Char(string="Sample name")
+    name = fields.Char(string="Content name")
     origin = fields.Text(string="Text to generate quetions")
     channel_name = fields.Many2one("slide.channel", string="")
     result = fields.Text(string="Result")
@@ -21,7 +21,7 @@ class QGen(models.Model):
         "slide.question", "gen_q_id", string="Questions", readonly=False
     )
 
-    def gen_quetions(self):
+    def gen_question_generation(self):
         ress = []
         nlp = pipelines.pipeline("question-generation")
         for seq in self.origin.split("----------------------------------------------"):
@@ -61,3 +61,8 @@ class QGen(models.Model):
                 }
             )
         self.result = str(ress)
+
+    def del_questions_and_content(self):
+        for q in self.question_ids:
+            q.unlink()
+        self.slide_name.unlink()

@@ -33,9 +33,6 @@ class QGen(models.Model):
     question_ids = fields.One2many(
         "slide.question", "gen_q_id", string="Questions", readonly=False
     )
-    nlp = pipelines.pipeline("question-generation")
-    qe = main.BoolQGen()
-    qg = main.QGen()
 
     def question_generation(self):
         res = []
@@ -77,8 +74,11 @@ class QGen(models.Model):
 
     def gen_question_generation(self):
         if self.ml_name == "question_generation":
+            self.nlp = pipelines.pipeline("question-generation")
             qag = self.question_generation()
         elif self.ml_name == "Questgen.ai":
+            self.qe = main.BoolQGen()
+            # qg = main.QGen()
             qag = self.quesgen_ai_bool()
         self.slide_name = self.env["slide.slide"].create(
             {

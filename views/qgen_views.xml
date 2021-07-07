@@ -10,6 +10,8 @@
             <field name="name"/>
             <field name="channel_name" require="true"/>
             <field name="origin"/>
+            <field name="ml_name" string="NN name"/>
+            <field name="spliter"/>
             <field name="result"/>
           </group>
           <button name="gen_question_generation" type="object" class="btn-primary" icon="fa-magic" string='Generate'></button>

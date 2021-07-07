@@ -378,7 +378,7 @@ def pipeline(
             # load default ans model
             ans_model = targeted_task["default"]["ans_model"]
             ans_tokenizer = AutoTokenizer.from_pretrained(ans_model)
-            ans_model = AutoModelForSeq2SeqLM.from_pretrained(ans_model, from_tf=True)
+            ans_model = AutoModelForSeq2SeqLM.from_pretrained(ans_model)
         else:
             # Try to infer tokenizer from model or config name (if provided as str)
             if ans_tokenizer is None:

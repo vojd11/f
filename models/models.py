@@ -2,6 +2,8 @@
 
 from odoo import models, fields
 
+from Questgen import main
+
 from . import pipelines
 import logging
 
@@ -17,20 +19,67 @@ class QGen(models.Model):
     channel_name = fields.Many2one("slide.channel", string="")
     result = fields.Text(string="Result")
     slide_name = fields.Many2one("slide.slide", string="")
+    ml_name = fields.Selection(
+        [
+            ("question_generation", "patil-suraj/question_generation"),
+            ("Questgen.ai", "ramsrigouthamg/Questgen.ai"),
+        ],
+        string="",
+    )
+    spliter = fields.Char(
+        string="Spliter for text",
+        defaul="----------------------------------------------",
+    )
     question_ids = fields.One2many(
         "slide.question", "gen_q_id", string="Questions", readonly=False
     )
+    nlp = pipelines.pipeline("question-generation")
+    qe = main.BoolQGen()
+    qg = main.QGen()
 
-    def gen_question_generation(self):
-        ress = []
-        nlp = pipelines.pipeline("question-generation")
-        for seq in self.origin.split("----------------------------------------------"):
+    def question_generation(self):
+        res = []
+        for seq in self.origin.split(self.spliter):
             try:
-                ress += nlp(seq)
+                quiz = self.nlp(seq)
+                res.append(
+                    {
+                        "q": quiz["question"],
+                        "a": [
+                            quiz["answer"],
+                            "Not a {}".format(quiz["answer"].lower()),
+                        ],
+                    }
+                )
             except ValueError:
                 _logger.error("Problem with:")
                 _logger.error(seq)
                 continue
+        return res
+
+    def quesgen_ai_bool(self):
+        # Generate boolean (Yes/No) Questions, now it's random
+        res = []
+
+        for seq in self.origin.split(self.spliter):
+            output = self.qe.predict_boolq({"input_text": seq})
+            for quiz in output["Boolean Questions"]:
+                res.append(
+                    {
+                        "q": quiz,
+                        "a": [
+                            "Yes",
+                            "No",
+                        ],
+                    }
+                )
+        return res
+
+    def gen_question_generation(self):
+        if self.ml_name == "question_generation":
+            qag = self.question_generation()
+        elif self.ml_name == "Questgen.ai":
+            qag = self.quesgen_ai_bool()
         self.slide_name = self.env["slide.slide"].create(
             {
                 "name": self.name,
@@ -38,29 +87,29 @@ class QGen(models.Model):
                 "channel_id": self.channel_name.id,
             }
         )
-        for quiz in ress:
+        for quiz in qag:
             q_id = self.env["slide.question"].create(
                 {
-                    "question": quiz["question"],
+                    "question": quiz["q"],
                     "slide_id": self.slide_name.id,
                     "gen_q_id": self.id,
                 }
             )
             self.env["slide.answer"].create(
                 {
-                    "text_value": quiz["answer"],
+                    "text_value": quiz["a"],
                     "question_id": q_id.id,
                     "is_correct": True,
                 }
             )
             self.env["slide.answer"].create(
                 {
-                    "text_value": "Not a {}".format(quiz["answer"].lower()),
+                    "text_value": quiz["a"],
                     "question_id": q_id.id,
                     "is_correct": False,
                 }
             )
-        self.result = str(ress)
+        self.result = str(qag)
 
     def del_questions_and_content(self):
         for q in self.question_ids:

@@ -34,11 +34,11 @@ class QGen(models.Model):
         "slide.question", "gen_q_id", string="Questions", readonly=False
     )
 
-    def question_generation(self):
+    def question_generation(self, nlp):
         res = []
         for seq in self.origin.split(self.spliter):
             try:
-                quiz = self.nlp(seq)
+                quiz = nlp(seq)
                 res.append(
                     {
                         "q": quiz["question"],
@@ -54,12 +54,12 @@ class QGen(models.Model):
                 continue
         return res
 
-    def quesgen_ai_bool(self):
+    def quesgen_ai_bool(self, qe):
         # Generate boolean (Yes/No) Questions, now it's random
         res = []
 
         for seq in self.origin.split(self.spliter):
-            output = self.qe.predict_boolq({"input_text": seq})
+            output = qe.predict_boolq({"input_text": seq})
             for quiz in output["Boolean Questions"]:
                 res.append(
                     {
@@ -74,12 +74,12 @@ class QGen(models.Model):
 
     def gen_question_generation(self):
         if self.ml_name == "question_generation":
-            self.nlp = pipelines.pipeline("question-generation")
-            qag = self.question_generation()
+            nlp = pipelines.pipeline("question-generation")
+            qag = self.question_generation(nlp)
         elif self.ml_name == "Questgen.ai":
-            self.qe = main.BoolQGen()
+            qe = main.BoolQGen()
             # qg = main.QGen()
-            qag = self.quesgen_ai_bool()
+            qag = self.quesgen_ai_bool(qe)
         self.slide_name = self.env["slide.slide"].create(
             {
                 "name": self.name,
